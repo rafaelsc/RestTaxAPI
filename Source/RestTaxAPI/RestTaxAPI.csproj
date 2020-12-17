@@ -28,6 +28,7 @@
     <PackageReference Include="Boxed.AspNetCore" Version="6.0.0" />
     <PackageReference Include="Boxed.AspNetCore.Swagger" Version="8.0.0" />
     <PackageReference Include="Boxed.Mapping" Version="5.2.0" />
+    <PackageReference Include="FixerSharp" Version="1.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.2.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
