@@ -87,7 +87,8 @@ namespace RestTaxAPI
                         options.KnownProxies.Clear();
                     })
                 .ConfigureAndValidateSingleton<CacheProfileOptions>(configuration.GetSection(nameof(ApplicationOptions.CacheProfiles)))
-                .ConfigureAndValidateSingleton<KestrelServerOptions>(configuration.GetSection(nameof(ApplicationOptions.Kestrel)));
+                .ConfigureAndValidateSingleton<KestrelServerOptions>(configuration.GetSection(nameof(ApplicationOptions.Kestrel)))
+                .ConfigureAndValidateSingleton<FixerOptions>(configuration.GetSection(nameof(ApplicationOptions.Fixer)));
 
         /// <summary>
         /// Adds dynamic response compression to enable GZIP compression of responses. This is turned off for HTTPS

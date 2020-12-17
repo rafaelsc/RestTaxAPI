@@ -7,6 +7,7 @@ namespace RestTaxAPI.Services
     using System.Linq;
     using FixerSharp;
     using Models;
+    using Options;
     using Repositories;
 
     /// <summary>
@@ -25,13 +26,7 @@ namespace RestTaxAPI.Services
 
     internal class ExchangeRateService : IExchangeRateService
     {
-        public ExchangeRateService()
-        {
-            var fixerApiKey = "";
-            if (string.IsNullOrWhiteSpace(fixerApiKey))
-                throw new ApplicationException("Invalid Fixer API Key, SetUp a API in the secret configfration file.");
-            Fixer.SetApiKey(fixerApiKey);
-        }
+        public ExchangeRateService(FixerOptions config) => Fixer.SetApiKey(config.ApiKey);
 
         public decimal GetExchangeRate(string sourceCurrency, string destinationCurrency)
         {
@@ -76,6 +71,8 @@ namespace RestTaxAPI.Services
             if (sourceCurrency == destinationCurrency)
                 return 1;
 
+            //TODO, Don't use the System Timme, to enable a easy mock.
+            
             var cachedData = Cache.GetOrAdd((sourceCurrency, destinationCurrency), (i) => (DateTimeOffset.UtcNow, this.ExchangeRateService.GetExchangeRate(i.Item1, i.Item2)));
             if (DateTimeOffset.UtcNow - cachedData.Item1 < CacheTimeout)
                 return cachedData.Item2; //Return the Cached rate;

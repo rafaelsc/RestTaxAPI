@@ -21,5 +21,8 @@ namespace RestTaxAPI.Options
         public ForwardedHeadersOptions ForwardedHeaders { get; set; }
 
         public KestrelServerOptions Kestrel { get; set; }
+
+        [Required]
+        public FixerOptions Fixer { get; set; }
     }
 }
