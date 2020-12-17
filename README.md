@@ -18,11 +18,11 @@ This is my first time Building a Restful API using a custom Template made by the
 - SpeckFlow (Test)
 - FluentAssertions (Test)
 - AutoFixture
-- 
 
-## TODO ##\
+## TODO ##
 - Improve some validation error messages.
 - Move some configuration from code to config files
+- Enable C# Nullablre reference
 - Add a Unit Test Project
 - Add more Integration Tests
 - Add more XML Documentation
