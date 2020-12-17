@@ -27,7 +27,10 @@ namespace RestTaxAPI.Services
     {
         public ExchangeRateService()
         {
-            Fixer.SetApiKey("70917b78c21d431cd1f5f16e2763a551");
+            var fixerApiKey = "";
+            if (string.IsNullOrWhiteSpace(fixerApiKey))
+                throw new ApplicationException("Invalid Fixer API Key, SetUp a API in the secret configfration file.");
+            Fixer.SetApiKey(fixerApiKey);
         }
 
         public decimal GetExchangeRate(string sourceCurrency, string destinationCurrency)
@@ -35,7 +38,7 @@ namespace RestTaxAPI.Services
             if (sourceCurrency == destinationCurrency)
                 return 1;
 
-            var rate = Fixer.Rate(sourceCurrency, Symbols.GBP);
+            var rate = Fixer.Rate(sourceCurrency, destinationCurrency);
             var exchangeRate = rate.Convert(1);
             return (decimal)exchangeRate;
         }
