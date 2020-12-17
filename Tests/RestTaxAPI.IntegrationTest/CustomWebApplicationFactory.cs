@@ -31,6 +31,8 @@ namespace RestTaxAPI.IntegrationTest
         public ApplicationOptions ApplicationOptions { get; private set; }
 
         public Mock<IClockService> ClockServiceMock { get; } = new Mock<IClockService>(MockBehavior.Strict);
+        public Mock<IExchangeRateService> ExchangeRateService { get; } = new Mock<IExchangeRateService>(MockBehavior.Strict);
+
 
         public void VerifyAllMocks() => Mock.VerifyAll(this.ClockServiceMock);
 
@@ -52,7 +54,9 @@ namespace RestTaxAPI.IntegrationTest
 
         protected virtual void ConfigureServices(IServiceCollection services) =>
             services
-                .AddSingleton(this.ClockServiceMock.Object);
+                .AddSingleton(this.ClockServiceMock.Object)
+                .AddSingleton(this.ExchangeRateService.Object);
+
 
         protected override void Dispose(bool disposing)
         {

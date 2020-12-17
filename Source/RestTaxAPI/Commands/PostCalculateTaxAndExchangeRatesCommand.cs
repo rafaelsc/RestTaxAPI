@@ -17,10 +17,13 @@ namespace RestTaxAPI.Commands
     internal class PostCalculateTaxAndExchangeRatesCommand : IPostCalculateTaxAndExchangeRatesCommand
     {
         private IExchangeRateService ExchangeRateService { get; }
+        private ITaxCalculatorService TaxCalculatorService { get; }
 
-        public PostCalculateTaxAndExchangeRatesCommand(IExchangeRateService exchangeRateService)
+
+        public PostCalculateTaxAndExchangeRatesCommand(IExchangeRateService exchangeRateService, ITaxCalculatorService taxCalculatorService)
         {
             this.ExchangeRateService = exchangeRateService;
+            this.TaxCalculatorService = taxCalculatorService;
         }
 
         public IActionResult Execute(InvoiceRequest requestData)
@@ -32,12 +35,16 @@ namespace RestTaxAPI.Commands
             Debug.Assert(invoiceRequest != null, "invoiceRequest != null");
             Debug.Assert(invoiceRequest.PreTaxAmountInCents != null, "invoiceRequest.PreTaxAmountInCents != null");
 
-            var exchangeRate = this.ExchangeRateService.GetExchangeRate(invoiceRequest.PreTaxAmountCurrencyCode, invoiceRequest.PaymentCurrencyCode);
-            var taxOfCurrency = 0.09M; //TODO
+            var sourceCurrency = invoiceRequest.PreTaxAmountCurrencyCode;
+            var destinationCurrency = invoiceRequest.PaymentCurrencyCode;
 
-            var preTaxTotal = (long)Math.Ceiling(invoiceRequest.PreTaxAmountInCents.Value * exchangeRate);
-            var calculatedTax = (long)Math.Ceiling(invoiceRequest.PreTaxAmountInCents.Value * taxOfCurrency);
+            var exchangeRate = this.ExchangeRateService.GetExchangeRate(sourceCurrency, destinationCurrency);
+            var taxOfCurrency = this.TaxCalculatorService.GetTaxPercentage(destinationCurrency);
+
+            var preTaxTotal = (long)Math.Round(invoiceRequest.PreTaxAmountInCents.Value * exchangeRate, MidpointRounding.AwayFromZero);
+            var calculatedTax = (long)Math.Round(preTaxTotal * taxOfCurrency, MidpointRounding.AwayFromZero);
             var grandTotal = preTaxTotal + calculatedTax;
+            
             var responseData = new InvoiceResponse()
             {
                 CurrencyCode = requestData.PaymentCurrencyCode,
