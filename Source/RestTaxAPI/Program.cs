@@ -20,9 +20,7 @@ namespace RestTaxAPI
         public static async Task<int> LogAndRunAsync(IHost host)
         {
             if (host is null)
-            {
                 throw new ArgumentNullException(nameof(host));
-            }
 
             var hostEnvironment = host.Services.GetRequiredService<IHostEnvironment>();
             hostEnvironment.ApplicationName = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product;
@@ -31,26 +29,20 @@ namespace RestTaxAPI
 
             try
             {
-                Log.Information(
-                    "Started {Application} in {Environment} mode.",
-                    hostEnvironment.ApplicationName,
-                    hostEnvironment.EnvironmentName);
+                Log.Information("Started {Application} in {Environment} mode.", hostEnvironment.ApplicationName, hostEnvironment.EnvironmentName);
+
                 await host.RunAsync().ConfigureAwait(false);
-                Log.Information(
-                    "Stopped {Application} in {Environment} mode.",
-                    hostEnvironment.ApplicationName,
-                    hostEnvironment.EnvironmentName);
+
+                Log.Information("Stopped {Application} in {Environment} mode.", hostEnvironment.ApplicationName, hostEnvironment.EnvironmentName);
+
                 return 0;
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception exception)
 #pragma warning restore CA1031 // Do not catch general exception types
             {
-                Log.Fatal(
-                    exception,
-                    "{Application} terminated unexpectedly in {Environment} mode.",
-                    hostEnvironment.ApplicationName,
-                    hostEnvironment.EnvironmentName);
+                Log.Fatal(exception, "{Application} terminated unexpectedly in {Environment} mode.", hostEnvironment.ApplicationName, hostEnvironment.EnvironmentName);
+
                 return 1;
             }
             finally
@@ -62,12 +54,9 @@ namespace RestTaxAPI
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             new HostBuilder()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureHostConfiguration(
-                    configurationBuilder => configurationBuilder
-                        .AddEnvironmentVariables(prefix: "DOTNET_")
-                        .AddIf(
-                            args is not null,
-                            x => x.AddCommandLine(args)))
+                .ConfigureHostConfiguration(configurationBuilder => configurationBuilder
+                    .AddEnvironmentVariables(prefix: "DOTNET_")
+                    .AddIf(args is not null, x => x.AddCommandLine(args)))
                 .ConfigureAppConfiguration((hostingContext, config) =>
                     AddConfiguration(config, hostingContext.HostingEnvironment, args))
                 .UseSerilog()
@@ -93,9 +82,7 @@ namespace RestTaxAPI
                 .UseIIS()
                 .UseStartup<Startup>();
 
-        private static IConfigurationBuilder AddConfiguration(
-            IConfigurationBuilder configurationBuilder,
-            IHostEnvironment hostEnvironment,
+        private static IConfigurationBuilder AddConfiguration(IConfigurationBuilder configurationBuilder, IHostEnvironment hostEnvironment,
             string[] args) =>
             configurationBuilder
                 // Add configuration from the appsettings.json file.
@@ -120,20 +107,21 @@ namespace RestTaxAPI
                 // http://docs.asp.net/en/latest/security/app-secrets.html
                 .AddEnvironmentVariables()
                 // Add command line options. These take the highest priority.
-                .AddIf(
-                    args is not null,
-                    x => x.AddCommandLine(args));
+                .AddIf(args is not null, x => x.AddCommandLine(args));
 
         private static Logger CreateLogger(IHost host)
         {
             var hostEnvironment = host.Services.GetRequiredService<IHostEnvironment>();
             return new LoggerConfiguration()
                 .ReadFrom.Configuration(host.Services.GetRequiredService<IConfiguration>())
+                .Enrich.FromLogContext()
                 .Enrich.WithProperty("Application", hostEnvironment.ApplicationName)
                 .Enrich.WithProperty("Environment", hostEnvironment.EnvironmentName)
+                .Enrich.WithProperty("ExecutionId", Guid.NewGuid())
                 .WriteTo.Conditional(
                     x => hostEnvironment.IsDevelopment(),
                     x => x.Console().WriteTo.Debug())
+                //TODO Improve Logging in PRD
                 .CreateLogger();
         }
     }

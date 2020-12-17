@@ -57,10 +57,10 @@ namespace RestTaxAPI
                     .AddCustomJsonOptions(this.webHostEnvironment)
                     .AddCustomMvcOptions(this.configuration)
                 .Services
-                .AddProjectCommands()
-                .AddProjectMappers()
-                .AddProjectRepositories()
-                .AddProjectServices();
+                    .AddProjectCommands()
+                    .AddProjectMappers()
+                    .AddProjectRepositories()
+                    .AddProjectServices();
 
         /// <summary>
         /// Configures the application and HTTP request pipeline. Configure is called after ConfigureServices is
@@ -69,18 +69,12 @@ namespace RestTaxAPI
         /// <param name="application">The application builder.</param>
         public virtual void Configure(IApplicationBuilder application) =>
             application
-                .UseIf(
-                    this.webHostEnvironment.IsDevelopment(),
-                    x => x.UseServerTiming())
+                .UseIf(this.webHostEnvironment.IsDevelopment(), x => x.UseServerTiming())
                 .UseForwardedHeaders()
                 .UseResponseCaching()
                 .UseResponseCompression()
-                .UseIf(
-                    !this.webHostEnvironment.IsDevelopment(),
-                    x => x.UseHsts())
-                .UseIf(
-                    this.webHostEnvironment.IsDevelopment(),
-                    x => x.UseDeveloperExceptionPage())
+                .UseIf(!this.webHostEnvironment.IsDevelopment(), x => x.UseHsts())
+                .UseIf(this.webHostEnvironment.IsDevelopment(), x => x.UseDeveloperExceptionPage())
                 .UseRouting()
                 .UseCors(CorsPolicyName.AllowAny)
                 .UseStaticFilesWithCacheControl()
