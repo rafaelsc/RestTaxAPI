@@ -46,11 +46,36 @@ namespace RestTaxAPI.IntegrationTest.Controllers
             Assert.Equal(new[] { HttpMethods.Post, HttpMethods.Options }, response.Content.Headers.Allow);
         }
 
-        public async Task Get_InvoiceCurrencyExchangeRoot_Returns200OkAsync()
+        [Fact]
+        public async Task Post_InvoiceCurrencyExchange_Test1_Returns200OkAsync()
         {
-            var data = new InvoiceRequest { Date = new DateTime(2020, 8, 5, 0, 0, 0), PreTaxAmountCurrencyCode = "EUR", PreTaxAmountInCents = 12345, PaymentCurrencyCode = "USD" };
-            var expected = new InvoiceResponse { CurrencyCode = "USD", PreTaxTotalInCents = 14657, GrandTotalInCents = 16123, ExchangeRate = 1.187247m };
+            var data = new InvoiceRequest { Date = new DateTime(2020, 8, 5, 0, 0, 0), PreTaxAmountCurrencyCode = "EUR", PreTaxAmountInCents = 123_45, PaymentCurrencyCode = "USD" };
+            var expected = new InvoiceResponse { CurrencyCode = "USD", PreTaxTotalInCents = 146_57, TaxAmountInCents = 14_66, GrandTotalInCents = 161_23, ExchangeRate = 1.187247m };
 
+            await this.PostInvoiceData(data, expected).ConfigureAwait(false);;
+        }
+
+        [Fact]
+        public async Task Post_InvoiceCurrencyExchange_Test2_Returns200OkAsync()
+        {
+            var data = new InvoiceRequest { Date = new DateTime(2019, 7, 12, 0, 0, 0), PreTaxAmountCurrencyCode = "EUR", PreTaxAmountInCents = 1_000_00, PaymentCurrencyCode = "EUR" };
+            var expected = new InvoiceResponse { CurrencyCode = "EUR", PreTaxTotalInCents = 1_000_00, TaxAmountInCents = 90_00, GrandTotalInCents = 1_090_00, ExchangeRate = 1 };
+
+            await this.PostInvoiceData(data, expected).ConfigureAwait(false);
+            ;
+        }
+        [Fact]
+        public async Task Post_InvoiceCurrencyExchange_Test3_Returns200OkAsync()
+        {
+            var data = new InvoiceRequest { Date = new DateTime(2020, 8, 19, 0, 0, 0), PreTaxAmountCurrencyCode = "EUR", PreTaxAmountInCents = 6543_21, PaymentCurrencyCode = "CAD" };
+            var expected = new InvoiceResponse { CurrencyCode = "CAD", PreTaxTotalInCents = 10_239_07, TaxAmountInCents = 1_126_30, GrandTotalInCents = 11_365_37, ExchangeRate = 1.564839m };
+
+            await this.PostInvoiceData(data, expected).ConfigureAwait(false);
+            ;
+        }
+
+        private async Task PostInvoiceData(InvoiceRequest data, InvoiceResponse expected)
+        {
             var response = await this.client.PostAsJsonAsync(new Uri("invoice/currencyExchange", UriKind.Relative), data).ConfigureAwait(false);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

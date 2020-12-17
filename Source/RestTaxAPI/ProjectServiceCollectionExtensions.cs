@@ -18,11 +18,12 @@ namespace RestTaxAPI
     {
         public static IServiceCollection AddProjectCommands(this IServiceCollection services) =>
             services
-                .AddSingleton<IGetCurrenciesCommand, GetCurrenciesCommand>();
-
+                .AddSingleton<IGetCurrenciesCommand, GetCurrenciesCommand>()
+                .AddSingleton<IPostCalculateTaxAndExchangeRatesCommand, PostCalculateTaxAndExchangeRatesCommand>();
+        
         public static IServiceCollection AddProjectMappers(this IServiceCollection services) =>
             services;
-        
+
         public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
             services
                 .AddSingleton<ICurrencyRepository, CurrencyRepository>();
