@@ -30,11 +30,9 @@ namespace RestTaxAPI.IntegrationTest
 
         public ApplicationOptions ApplicationOptions { get; private set; }
 
-        public Mock<ICarRepository> CarRepositoryMock { get; } = new Mock<ICarRepository>(MockBehavior.Strict);
-
         public Mock<IClockService> ClockServiceMock { get; } = new Mock<IClockService>(MockBehavior.Strict);
 
-        public void VerifyAllMocks() => Mock.VerifyAll(this.CarRepositoryMock, this.ClockServiceMock);
+        public void VerifyAllMocks() => Mock.VerifyAll(this.ClockServiceMock);
 
         protected override void ConfigureClient(HttpClient client)
         {
@@ -54,7 +52,6 @@ namespace RestTaxAPI.IntegrationTest
 
         protected virtual void ConfigureServices(IServiceCollection services) =>
             services
-                .AddSingleton(this.CarRepositoryMock.Object)
                 .AddSingleton(this.ClockServiceMock.Object);
 
         protected override void Dispose(bool disposing)

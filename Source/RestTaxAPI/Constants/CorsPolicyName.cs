@@ -1,4 +1,4 @@
-﻿namespace RestTaxAPI.Constants
+namespace RestTaxAPI.Constants
 {
     public static class CorsPolicyName
     {

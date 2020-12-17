@@ -1,7 +1,6 @@
 namespace RestTaxAPI
 {
     using RestTaxAPI.Commands;
-    using RestTaxAPI.Mappers;
     using RestTaxAPI.Repositories;
     using RestTaxAPI.Services;
     using RestTaxAPI.ViewModels;
@@ -20,22 +19,14 @@ namespace RestTaxAPI
     {
         public static IServiceCollection AddProjectCommands(this IServiceCollection services) =>
             services
-                .AddSingleton<IDeleteCarCommand, DeleteCarCommand>()
-                .AddSingleton<IGetCarCommand, GetCarCommand>()
-                .AddSingleton<IGetCarPageCommand, GetCarPageCommand>()
-                .AddSingleton<IPatchCarCommand, PatchCarCommand>()
-                .AddSingleton<IPostCarCommand, PostCarCommand>()
-                .AddSingleton<IPutCarCommand, PutCarCommand>();
+                .AddSingleton<IGetCurrenciesCommand, GetCurrenciesCommand>();
 
         public static IServiceCollection AddProjectMappers(this IServiceCollection services) =>
-            services
-                .AddSingleton<IMapper<Models.Car, Car>, CarToCarMapper>()
-                .AddSingleton<IMapper<Models.Car, SaveCar>, CarToSaveCarMapper>()
-                .AddSingleton<IMapper<SaveCar, Models.Car>, CarToSaveCarMapper>();
-
+            services;
+        
         public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
             services
-                .AddSingleton<ICarRepository, CarRepository>();
+                .AddSingleton<ICurrencyRepository, CurrencyRepository>();
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services
