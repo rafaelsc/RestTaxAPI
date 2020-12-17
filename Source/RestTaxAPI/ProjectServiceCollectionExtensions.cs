@@ -3,7 +3,6 @@ namespace RestTaxAPI
     using RestTaxAPI.Commands;
     using RestTaxAPI.Repositories;
     using RestTaxAPI.Services;
-    using RestTaxAPI.ViewModels;
     using Boxed.Mapping;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +14,7 @@ namespace RestTaxAPI
     /// AddScoped - A new instance is created and returned for each request/response cycle.
     /// AddTransient - A new instance is created and returned each time.
     /// </remarks>
-    public static class ProjectServiceCollectionExtensions
+    internal static class ProjectServiceCollectionExtensions
     {
         public static IServiceCollection AddProjectCommands(this IServiceCollection services) =>
             services

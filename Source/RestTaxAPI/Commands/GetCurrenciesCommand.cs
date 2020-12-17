@@ -8,7 +8,7 @@ namespace RestTaxAPI.Commands
     {
     }
 
-    class GetCurrenciesCommand : IGetCurrenciesCommand
+    internal class GetCurrenciesCommand : IGetCurrenciesCommand
     {
         private readonly ICurrencyRepository currencyRepository;
 

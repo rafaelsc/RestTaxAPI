@@ -4,7 +4,6 @@ namespace RestTaxAPI.Controllers
     using System.Threading.Tasks;
     using RestTaxAPI.Commands;
     using RestTaxAPI.Constants;
-    using RestTaxAPI.ViewModels;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Net.Http.Headers;
