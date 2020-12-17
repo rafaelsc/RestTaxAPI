@@ -2,12 +2,20 @@ namespace RestTaxAPI.Repositories
 {
     using System.Collections.Generic;
     using RestTaxAPI.Models;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface ICurrencyRepository
     {
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<Currency> GetAllAllowed();
     }
     
-    public class CurrencyRepository : ICurrencyRepository
+    internal class CurrencyRepository : ICurrencyRepository
     {
         private static readonly List<Currency> AllowedCurrencies = new List<Currency>()
         {

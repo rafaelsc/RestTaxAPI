@@ -1,5 +1,6 @@
 namespace RestTaxAPI.Controllers
 {
+    using System.ComponentModel.DataAnnotations;
     using System.Threading;
     using System.Threading.Tasks;
     using RestTaxAPI.Commands;
@@ -49,7 +50,7 @@ namespace RestTaxAPI.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The Invoice data is invalid.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The MIME type in the Accept HTTP header is not acceptable.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status415UnsupportedMediaType, "The MIME type in the Content-Type HTTP header is unsupported.", typeof(ProblemDetails))]
-        public IActionResult PostPage([FromServices] IPostCalculateTaxAndExchangeRatesCommand command, [FromBody] InvoiceRequest invoiceRequest) => command.Execute(invoiceRequest);
+        public IActionResult PostPage([FromServices] IPostCalculateTaxAndExchangeRatesCommand command, [FromBody, Required] InvoiceRequest invoiceRequest) => command.Execute(invoiceRequest);
     }
 }
 #pragma warning restore CA1062 // Validate arguments of public methods

@@ -25,14 +25,14 @@ namespace RestTaxAPI.Models
         /// The ISO 4217 3-letter code for the currency used in the the PreTax Amount
         /// </summary>
         [Required]
-        [StringLength(3)]
+        [StringLength(3, MinimumLength = 3)]
         public string PreTaxAmountCurrencyCode { get; init; }
 
         /// <summary>
         /// The ISO 4217 3-letter code for the currency used in the the PreTax Amount
         /// </summary>
         [Required]
-        [StringLength(3)]
+        [StringLength(3, MinimumLength = 3)]
         public string PaymentCurrencyCode { get; init; }
     }
 }

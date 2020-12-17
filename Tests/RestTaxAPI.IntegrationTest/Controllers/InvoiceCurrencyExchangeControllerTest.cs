@@ -53,7 +53,6 @@ namespace RestTaxAPI.IntegrationTest.Controllers
             var expected = new InvoiceResponse { CurrencyCode = "USD", PreTaxTotalInCents = 146_57, TaxAmountInCents = 14_66, GrandTotalInCents = 161_23, ExchangeRate = 1.187247m };
 
             await this.PostInvoiceData(data, expected).ConfigureAwait(false);
-            ;
         }
 
         [Fact]
