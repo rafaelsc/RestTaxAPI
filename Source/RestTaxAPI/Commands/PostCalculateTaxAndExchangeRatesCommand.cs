@@ -5,6 +5,7 @@ namespace RestTaxAPI.Commands
     using Boxed.AspNetCore;
     using Microsoft.AspNetCore.Mvc;
     using Models;
+    using Services;
 
     /// <summary>
     /// TODO
@@ -15,16 +16,27 @@ namespace RestTaxAPI.Commands
 
     internal class PostCalculateTaxAndExchangeRatesCommand : IPostCalculateTaxAndExchangeRatesCommand
     {
+        private IExchangeRateService ExchangeRateService { get; }
+
+        public PostCalculateTaxAndExchangeRatesCommand(IExchangeRateService exchangeRateService)
+        {
+            this.ExchangeRateService = exchangeRateService;
+        }
+
         public IActionResult Execute(InvoiceRequest requestData)
         {
             Debug.Assert(requestData != null, "requestData != null");
-            Debug.Assert(requestData.PreTaxAmountInCents != null, "requestData.PreTaxAmountInCents != null");
 
-            var exchangeRate = 1M; //TODO
+            var invoiceRequest = NormalizeData(requestData);
+
+            Debug.Assert(invoiceRequest != null, "invoiceRequest != null");
+            Debug.Assert(invoiceRequest.PreTaxAmountInCents != null, "invoiceRequest.PreTaxAmountInCents != null");
+
+            var exchangeRate = this.ExchangeRateService.GetExchangeRate(invoiceRequest.PreTaxAmountCurrencyCode, invoiceRequest.PaymentCurrencyCode);
             var taxOfCurrency = 0.09M; //TODO
 
-            var preTaxTotal = (long)Math.Ceiling(requestData.PreTaxAmountInCents.Value * exchangeRate);
-            var calculatedTax = (long)Math.Ceiling(requestData.PreTaxAmountInCents.Value * taxOfCurrency);
+            var preTaxTotal = (long)Math.Ceiling(invoiceRequest.PreTaxAmountInCents.Value * exchangeRate);
+            var calculatedTax = (long)Math.Ceiling(invoiceRequest.PreTaxAmountInCents.Value * taxOfCurrency);
             var grandTotal = preTaxTotal + calculatedTax;
             var responseData = new InvoiceResponse()
             {
@@ -37,5 +49,12 @@ namespace RestTaxAPI.Commands
 
             return new OkObjectResult(responseData);
         }
+
+        private static InvoiceRequest NormalizeData(InvoiceRequest requestData) =>
+            requestData with
+            {
+                PaymentCurrencyCode = requestData.PaymentCurrencyCode.ToUpperInvariant(),
+                PreTaxAmountCurrencyCode = requestData.PreTaxAmountCurrencyCode.ToUpperInvariant()
+            };
     }
 }

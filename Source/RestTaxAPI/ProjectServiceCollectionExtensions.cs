@@ -30,6 +30,7 @@ namespace RestTaxAPI
 
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services
-                .AddSingleton<IClockService, ClockService>();
+                .AddSingleton<IClockService, ClockService>()
+                .AddSingleton<IExchangeRateService, ExchangeRateService>();
     }
 }
