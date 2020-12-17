@@ -49,9 +49,6 @@ namespace RestTaxAPI.IntegrationTest.Controllers
         public async Task Get_Currencies_Returns200OkAsync()
         {
             var response = await this.client.GetAsync(new Uri("currencies", UriKind.Relative)).ConfigureAwait(false);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
             var data = (await response.Content.ReadAsAsync<IEnumerable<Currency>>(this.formatters).ConfigureAwait(false))?.ToList();
 
             Assert.NotNull(data);

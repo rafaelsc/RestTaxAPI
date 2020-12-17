@@ -13,13 +13,13 @@ namespace RestTaxAPI.Controllers
     /// <summary>
     /// The Currencies Controller
     /// </summary>
-    [Route("[controller]")]
+    [Route("invoice/currencyExchange")]
     [ApiController]
     [ApiVersion(ApiVersionName.V1)]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "The MIME type in the Accept HTTP header is not acceptable.", typeof(ProblemDetails))]
 #pragma warning disable CA1822 // Mark members as static
 #pragma warning disable CA1062 // Validate arguments of public methods
-    public class CurrenciesController : ControllerBase
+    public class InvoiceCurrencyExchangeController : ControllerBase
     {
         /// <summary>
         /// Returns an Allow HTTP header with the allowed HTTP methods.
@@ -27,26 +27,29 @@ namespace RestTaxAPI.Controllers
         /// <returns>
         ///     A 200 OK response.
         /// </returns>
-        [HttpOptions(Name = CurrenciesControllerRoute.OptionsCurrencies)]
+        [HttpOptions(Name = InvoiceCurrencyExchangeControllerRoute.Options)]
         [SwaggerResponse(StatusCodes.Status200OK, "The allowed HTTP methods.")]
         public IActionResult Options()
         {
-            this.HttpContext.Response.Headers.AppendCommaSeparatedValues(HeaderNames.Allow, HttpMethods.Get, HttpMethods.Head, HttpMethods.Options);
+            this.HttpContext.Response.Headers.AppendCommaSeparatedValues(HeaderNames.Allow, HttpMethods.Post, HttpMethods.Options);
             return this.Ok();
         }
 
         /// <summary>
-        /// Gets a collection of allowed Currencies.
+        /// //TODO
         /// </summary>
         /// <param name="command">The action command.</param>
         /// <returns>
-        ///     A 200 OK response containing a collection of All allowed Currencies in this API
+        ///     A 200 OK response //TODO 
+        ///     A 400 BadRequest response //TODO
+        /// 
         /// </returns>
-        [HttpGet("", Name = CurrenciesControllerRoute.GetCurrencies)]
-        [HttpHead("", Name = CurrenciesControllerRoute.HeadCurrencies)]
-        [SwaggerResponse(StatusCodes.Status200OK, "A collection of all allowed Currencies.", typeof(Currency[]))]
+        [HttpPost("", Name = InvoiceCurrencyExchangeControllerRoute.CalculateTaxAndExchangeRates)]
+        [SwaggerResponse(StatusCodes.Status200OK, "The Invoice with tax and exchanged", typeof(Currency[]))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "The Invoice data is invalid.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The MIME type in the Accept HTTP header is not acceptable.", typeof(ProblemDetails))]
-        public IActionResult GetPage([FromServices] IGetCurrenciesCommand command) => command.Execute();
+        [SwaggerResponse(StatusCodes.Status415UnsupportedMediaType, "The MIME type in the Content-Type HTTP header is unsupported.", typeof(ProblemDetails))]
+        public IActionResult PostPage([FromServices] IPostCalculateTaxAndExchangeRatesCommand command) => command.Execute();
     }
 }
 #pragma warning restore CA1062 // Validate arguments of public methods

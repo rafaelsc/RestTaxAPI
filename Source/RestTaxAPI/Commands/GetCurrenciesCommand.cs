@@ -4,6 +4,9 @@ namespace RestTaxAPI.Commands
     using Microsoft.AspNetCore.Mvc;
     using Repositories;
 
+    /// <summary>
+    /// TODO
+    /// </summary>
     public interface IGetCurrenciesCommand : ICommand
     {
     }
