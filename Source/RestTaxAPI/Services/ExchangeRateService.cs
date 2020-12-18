@@ -1,8 +1,12 @@
 namespace RestTaxAPI.Services
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
     using FixerSharp;
+    using Models;
     using Options;
+    using Repositories;
 
     /// <summary>
     /// TODO
@@ -34,49 +38,32 @@ namespace RestTaxAPI.Services
         }
     }
 
-    //internal class CachedExchangeRateService : IExchangeRateService //TODO Test this Cached Service.
-    //{
-    //    private static TimeSpan CacheTimeout => TimeSpan.FromHours(1); //TODO: Add this to a config file.
+    internal class CachedExchangeRateService : IExchangeRateService //TODO Test this Cached Service. //TODO A lot of improvement in this class.
+    {
+        private static TimeSpan CacheTimeout => TimeSpan.FromSeconds(10); //TODO: Add this to a config file.
 
-    //    private static readonly ConcurrentDictionary<(string, string), (DateTimeOffset, decimal)> Cache = new();
+        private static readonly ConcurrentDictionary<(DateTime, string, string), (DateTimeOffset, decimal)> Cache = new();
 
-    //    private ExchangeRateService ExchangeRateService { get; }
+        private ExchangeRateService ExchangeRateService { get; }
 
-    //    public CachedExchangeRateService(ExchangeRateService exchangeRateService, ICurrencyRepository currencyRepository)
-    //    {
-    //        this.ExchangeRateService = exchangeRateService;
-    //        this.FillCache(currencyRepository.GetAllAllowed().ToArray());
-    //    }
+        public CachedExchangeRateService(ExchangeRateService exchangeRateService) => this.ExchangeRateService = exchangeRateService;
 
-    //    private void FillCache(Currency[] currencies)
-    //    {
-    //        var allCommutations = from c1 in currencies
-    //                              from c2 in currencies
-    //                              where c1.Code != c2.Code
-    //                              select (Source: c1.Code, Destination: c2.Code);
+        public decimal GetExchangeRate(DateTime date, string sourceCurrency, string destinationCurrency)
+        {
+            if (sourceCurrency == destinationCurrency)
+                return 1;
 
-    //        foreach (var curr in allCommutations)
-    //        {
-    //            this.GetExchangeRate(curr.Source, curr.Destination);
-    //        }
-    //    }
+            //TODO, Don't use the System Time, to enable a easy mock.
 
-    //    public decimal GetExchangeRate(DateTime date, string sourceCurrency, string destinationCurrency)
-    //    {
-    //        if (sourceCurrency == destinationCurrency)
-    //            return 1;
+            var cachedData = Cache.GetOrAdd((date, sourceCurrency, destinationCurrency), (i) => (DateTimeOffset.UtcNow, this.ExchangeRateService.GetExchangeRate(date, sourceCurrency, destinationCurrency)));
+            if (DateTimeOffset.UtcNow - cachedData.Item1 < CacheTimeout)
+                return cachedData.Item2; //Return the Cached rate;
 
-    //        //TODO, Don't use the System Timme, to enable a easy mock.
-            
-    //        var cachedData = Cache.GetOrAdd((sourceCurrency, destinationCurrency), (i) => (DateTimeOffset.UtcNow, this.ExchangeRateService.GetExchangeRate(i.Item1, i.Item2)));
-    //        if (DateTimeOffset.UtcNow - cachedData.Item1 < CacheTimeout)
-    //            return cachedData.Item2; //Return the Cached rate;
+            //TODO, BUG, If the ExchangeRateService.GetExchangeRate return slower than CacheTimeoutInSeconds a cache miss will happen.
 
-    //        //TODO, BUG, If the ExchangeRateService.GetExchangeRate return slower than CacheTimeoutInSeconds a cache miss will happen.
-
-    //        var currentRate = this.ExchangeRateService.GetExchangeRate(sourceCurrency, destinationCurrency);
-    //        Cache[(sourceCurrency, destinationCurrency)] = (DateTimeOffset.UtcNow, currentRate); //Update rate in the Cache
-    //        return currentRate;
-    //    }
-    //}
+            var currentRate = this.ExchangeRateService.GetExchangeRate(date, sourceCurrency, destinationCurrency);
+            Cache[(date, sourceCurrency, destinationCurrency)] = (DateTimeOffset.UtcNow, currentRate); //Update rate in the Cache
+            return currentRate;
+        }
+    }
 }

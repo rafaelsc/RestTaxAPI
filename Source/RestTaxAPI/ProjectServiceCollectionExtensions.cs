@@ -3,7 +3,6 @@ namespace RestTaxAPI
     using RestTaxAPI.Commands;
     using RestTaxAPI.Repositories;
     using RestTaxAPI.Services;
-    using Boxed.Mapping;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -31,7 +30,7 @@ namespace RestTaxAPI
         public static IServiceCollection AddProjectServices(this IServiceCollection services) =>
             services
                 .AddSingleton<IClockService, ClockService>()
-                .AddSingleton<IExchangeRateService, ExchangeRateService>()
+                .AddSingleton<IExchangeRateService, CachedExchangeRateService>()
                 .AddSingleton<ExchangeRateService>()
                 .AddSingleton<ITaxCalculatorService, FixedTaxCalculatorService>()
                 .AddSingleton<CalculateExchangeService>();
