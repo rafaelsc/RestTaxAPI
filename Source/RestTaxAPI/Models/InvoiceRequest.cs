@@ -11,14 +11,17 @@ namespace RestTaxAPI.Models
     public record InvoiceRequest : IValidatableObject
     {
         /// <summary>
-        /// The invoice date
+        /// The invoice date. ISO Day format (YYYY-MM-DD).
+        /// Date should be from 2000-01-01 to Today
         /// </summary>
+        /// <example>2020-03-04</example>
         [Required]
         [DataType(DataType.Date)]
         public DateTime? Date { get; init; } //TODO: Use DateTimeOffset
 
         /// <summary>
         /// The Pre-Tax Amount in cents (Unit: Cents)
+        /// Should be positive
         /// </summary>
         [Required]
         [Range(0, long.MaxValue)]
@@ -38,6 +41,7 @@ namespace RestTaxAPI.Models
         [StringLength(3, MinimumLength = 3)]
         public string PaymentCurrencyCode { get; init; }
 
+        
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             Debug.Assert(this.Date != null, nameof(this.Date) + " != null");
