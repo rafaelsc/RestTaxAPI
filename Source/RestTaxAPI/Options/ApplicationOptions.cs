@@ -22,7 +22,6 @@ namespace RestTaxAPI.Options
 
         public KestrelServerOptions Kestrel { get; set; }
 
-        [Required]
         public FixerOptions Fixer { get; set; }
     }
 }
