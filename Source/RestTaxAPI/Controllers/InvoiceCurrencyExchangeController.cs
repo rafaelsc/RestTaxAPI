@@ -37,16 +37,16 @@ namespace RestTaxAPI.Controllers
         }
 
         /// <summary>
-        /// //TODO
+        /// Calculate The Invoice with the Tax and all exchange rates applied.
         /// </summary>
         /// <param name="command">The action command.</param>
-        /// <param name="invoiceRequest">TODO</param>
+        /// <param name="invoiceRequest">The Request Data</param>
         /// <returns>
-        ///     A 200 OK response //TODO 
-        ///     A 400 BadRequest response //TODO
+        ///     A 200 OK response With the Invoice Data Calculated
+        ///     A 400 BadRequest response when the Invoice Data is invalid
         /// </returns>
         [HttpPost("", Name = InvoiceCurrencyExchangeControllerRoute.CalculateTaxAndExchangeRates)]
-        [SwaggerResponse(StatusCodes.Status200OK, "The Invoice with tax and exchanged", typeof(Currency[]))]
+        [SwaggerResponse(StatusCodes.Status200OK, "The Invoice with tax and exchanged", typeof(InvoiceResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The Invoice data is invalid.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status406NotAcceptable, "The MIME type in the Accept HTTP header is not acceptable.", typeof(ProblemDetails))]
         [SwaggerResponse(StatusCodes.Status415UnsupportedMediaType, "The MIME type in the Content-Type HTTP header is unsupported.", typeof(ProblemDetails))]

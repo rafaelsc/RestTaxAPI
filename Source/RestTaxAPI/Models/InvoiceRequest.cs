@@ -12,6 +12,7 @@ namespace RestTaxAPI.Models
         /// The invoice date
         /// </summary>
         [Required]
+        [DataType(DataType.Date)]
         public DateTime? Date { get; init; } //TODO: Use DateTimeOffset
 
         /// <summary>

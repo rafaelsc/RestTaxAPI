@@ -2,11 +2,8 @@ namespace RestTaxAPI.Services
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Linq;
     using FixerSharp;
-    using Models;
     using Options;
-    using Repositories;
 
     /// <summary>
     /// TODO
@@ -40,7 +37,7 @@ namespace RestTaxAPI.Services
 
     internal class CachedExchangeRateService : IExchangeRateService //TODO Test this Cached Service. //TODO A lot of improvement in this class.
     {
-        private static TimeSpan CacheTimeout => TimeSpan.FromSeconds(10); //TODO: Add this to a config file.
+        private static TimeSpan CacheTimeout => TimeSpan.FromDays(1); //TODO: Add this to a config file.
 
         private static readonly ConcurrentDictionary<(DateTime, string, string), (DateTimeOffset, decimal)> Cache = new();
 
