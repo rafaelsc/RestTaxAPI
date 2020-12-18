@@ -1,6 +1,5 @@
 namespace RestTaxAPI.Commands
 {
-    using System;
     using System.Diagnostics;
     using System.Linq;
     using Boxed.AspNetCore;
@@ -20,18 +19,13 @@ namespace RestTaxAPI.Commands
 
     internal class PostCalculateTaxAndExchangeRatesCommand : IPostCalculateTaxAndExchangeRatesCommand
     {
-        private IExchangeRateService ExchangeRateService { get; }
-        private ITaxCalculatorService TaxCalculatorService { get; }
-        private readonly ICurrencyRepository CurrencyRepository;
+        private ICurrencyRepository Repository { get; }
+        private CalculateExchangeService ExchangeService { get; }
 
-        private IObjectModelValidator ModelValidator { get; }
-
-        public PostCalculateTaxAndExchangeRatesCommand(IExchangeRateService exchangeRateService, ITaxCalculatorService taxCalculatorService, IObjectModelValidator modelValidator, ICurrencyRepository currencyRepository)
+        public PostCalculateTaxAndExchangeRatesCommand(ICurrencyRepository repository, CalculateExchangeService exchangeService)
         {
-            this.ExchangeRateService = exchangeRateService;
-            this.TaxCalculatorService = taxCalculatorService;
-            this.ModelValidator = modelValidator;
-            this.CurrencyRepository = currencyRepository;
+            this.Repository = repository;
+            this.ExchangeService = exchangeService;
         }
 
         public IActionResult Execute(InvoiceRequest requestData)
@@ -40,31 +34,14 @@ namespace RestTaxAPI.Commands
 
             var invoiceRequest = NormalizeData(requestData);
 
-            Debug.Assert(invoiceRequest != null, "invoiceRequest != null");
-            Debug.Assert(invoiceRequest.Date != null, "invoiceRequest.Date != null");
-            Debug.Assert(invoiceRequest.PreTaxAmountInCents != null, "invoiceRequest.PreTaxAmountInCents != null");
-
             var sourceCurrency = invoiceRequest.PreTaxAmountCurrencyCode;
             var destinationCurrency = invoiceRequest.PaymentCurrencyCode;
 
+            //TODO Improve Model Validation
             if (this.ValidateModel(sourceCurrency, destinationCurrency, out var badRequestActionResult))
                 return badRequestActionResult; //BUG: This return is not in the same format that the Swagger is defined. Need more studies how to solve.
 
-            var exchangeRate = this.ExchangeRateService.GetExchangeRate(invoiceRequest.Date.Value, sourceCurrency, destinationCurrency);
-            var taxOfCurrency = this.TaxCalculatorService.GetTaxPercentage(destinationCurrency);
-
-            var preTaxTotal = (long)Math.Round(invoiceRequest.PreTaxAmountInCents.Value * exchangeRate, MidpointRounding.AwayFromZero);
-            var calculatedTax = (long)Math.Round(preTaxTotal * taxOfCurrency, MidpointRounding.AwayFromZero);
-            var grandTotal = preTaxTotal + calculatedTax;
-
-            var responseData = new InvoiceResponse()
-            {
-                CurrencyCode = requestData.PaymentCurrencyCode,
-                ExchangeRate = exchangeRate,
-                PreTaxTotalInCents = preTaxTotal,
-                TaxAmountInCents = calculatedTax,
-                GrandTotalInCents = grandTotal,
-            };
+            var responseData = this.ExchangeService.CalculateExchange(requestData, invoiceRequest);
 
             return new OkObjectResult(responseData);
         }
@@ -73,7 +50,7 @@ namespace RestTaxAPI.Commands
         {
             badRequestActionResult = null;
 
-            var allowedCurrencies = this.CurrencyRepository.GetAllAllowed().ToArray();
+            var allowedCurrencies = this.Repository.GetAllAllowed().ToArray();
             if (allowedCurrencies.Select(c => c.Code).Contains(sourceCurrency) == false)
             {
                 var validationModel = new ModelStateDictionary();
