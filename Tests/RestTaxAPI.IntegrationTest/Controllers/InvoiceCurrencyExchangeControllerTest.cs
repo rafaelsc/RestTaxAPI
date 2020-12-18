@@ -112,7 +112,7 @@ namespace RestTaxAPI.IntegrationTest.Controllers
 
         private async Task PostInvoiceDataReturningOK(InvoiceRequest data, InvoiceResponse expected)
         {
-            this.ExchangeRateService.Setup(x => x.GetExchangeRate(It.IsAny<string>(), It.IsAny<string>()))
+            this.ExchangeRateService.Setup(x => x.GetExchangeRate(It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<string>()))
                                     .Returns(expected.ExchangeRate.Value);
 
             var response = await this.client.PostAsJsonAsync(new Uri("invoice/currencyExchange", UriKind.Relative), data).ConfigureAwait(false);

@@ -41,6 +41,7 @@ namespace RestTaxAPI.Commands
             var invoiceRequest = NormalizeData(requestData);
 
             Debug.Assert(invoiceRequest != null, "invoiceRequest != null");
+            Debug.Assert(invoiceRequest.Date != null, "invoiceRequest.Date != null");
             Debug.Assert(invoiceRequest.PreTaxAmountInCents != null, "invoiceRequest.PreTaxAmountInCents != null");
 
             var sourceCurrency = invoiceRequest.PreTaxAmountCurrencyCode;
@@ -49,7 +50,7 @@ namespace RestTaxAPI.Commands
             if (this.ValidateModel(sourceCurrency, destinationCurrency, out var badRequestActionResult))
                 return badRequestActionResult; //BUG: This return is not in the same format that the Swagger is defined. Need more studies how to solve.
 
-            var exchangeRate = this.ExchangeRateService.GetExchangeRate(sourceCurrency, destinationCurrency);
+            var exchangeRate = this.ExchangeRateService.GetExchangeRate(invoiceRequest.Date.Value, sourceCurrency, destinationCurrency);
             var taxOfCurrency = this.TaxCalculatorService.GetTaxPercentage(destinationCurrency);
 
             var preTaxTotal = (long)Math.Round(invoiceRequest.PreTaxAmountInCents.Value * exchangeRate, MidpointRounding.AwayFromZero);
