@@ -1,12 +1,14 @@
 namespace RestTaxAPI.Models
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Diagnostics;
 
     /// <summary>
     /// The Invoice Request data
     /// </summary>
-    public record InvoiceRequest
+    public record InvoiceRequest : IValidatableObject
     {
         /// <summary>
         /// The invoice date
@@ -35,5 +37,15 @@ namespace RestTaxAPI.Models
         [Required]
         [StringLength(3, MinimumLength = 3)]
         public string PaymentCurrencyCode { get; init; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            Debug.Assert(this.Date != null, nameof(this.Date) + " != null");
+
+            if (this.Date.Value.Date < new DateTime(2000, 1, 1))
+                yield return new ValidationResult("Invalid Date. Date should be bigger than 2000-01-01.", new[] { nameof(this.Date) });
+            if (this.Date.Value.Date > DateTime.Today)
+                yield return new ValidationResult("Invalid Date. Date should not be a future date.", new[] { nameof(this.Date) });
+        }
     }
 }
